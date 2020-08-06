@@ -15,9 +15,11 @@ public class Conta {
 	private Long id;
 	private double saldo;
 	private int agencia;
+	
 	@OneToOne
 	@JoinColumn(name = "titular", referencedColumnName = "id")
 	public Cliente titular;
+	
 	private int numero;
 	
 	public Long getId() {

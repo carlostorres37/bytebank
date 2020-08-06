@@ -1,5 +1,6 @@
 package com.alura.bytebank.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alura.bytebank.dto.ClienteDTO;
 import com.alura.bytebank.model.Cliente;
 import com.alura.bytebank.service.ClienteService;
 
@@ -25,15 +27,36 @@ public class ClienteController {
 	@Autowired
 	private ClienteService clienteService;
 
+	/**
+	 * 200 OK
+	 * 201 CREATED
+	 * 204 NO CONTENT (DELETE)
+	 * 
+	 */
 	@GetMapping
-	public List<Cliente> buscaCliente() {
-		return clienteService.buscaCliente();
+	public ResponseEntity<List<ClienteDTO>> buscaCliente() {
+		List<ClienteDTO> clientesDTO = new ArrayList<ClienteDTO>();
+		
+		List<Cliente> clientes = clienteService.buscaCliente();
+		if(clientes != null) {
+			for (Cliente cliente : clientes) {
+				ClienteDTO clienteDTO = new ClienteDTO();
+				clienteDTO.setNome(cliente.getNome());
+				clienteDTO.setCpfComStatus(cliente.getCpf() + " - " + cliente.isAtivo());
+				clientesDTO.add(clienteDTO);
+			}
+			
+		} else {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(clientesDTO);	
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(clientesDTO);
 	}
 	
 	@GetMapping("/{id}")
 	public Optional<Cliente> buscaClientePorId(@PathVariable("id") Long idCliente) {
 		return clienteService.buscaClientePorId(idCliente);
-	} // 404 NOT FOUND
+	}
 	
 	@PostMapping
 	public void adicionaCliente(@RequestBody Cliente cliente) {
